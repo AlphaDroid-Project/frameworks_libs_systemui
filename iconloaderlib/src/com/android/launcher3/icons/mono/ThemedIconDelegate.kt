@@ -21,6 +21,7 @@ import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.Rect
+import android.provider.Settings
 import com.android.launcher3.icons.BitmapInfo
 import com.android.launcher3.icons.FastBitmapDrawable
 import com.android.launcher3.icons.FastBitmapDrawableDelegate
@@ -83,15 +84,32 @@ class ThemedIconDelegate(
     companion object {
         const val TAG: String = "ThemedIconDrawable"
 
+        private const val THEMED_ICON_STYLE_SETTING = "themed_icon_style"
+        private const val STYLE_AOSP = "aosp"
+
+        private fun isAxIconsEnabled(context: Context): Boolean {
+            val style = Settings.Secure.getString(
+                context.contentResolver, THEMED_ICON_STYLE_SETTING)
+            return STYLE_AOSP != style
+        }
+
         /** Get an int array representing background and foreground colors for themed icons */
         @JvmStatic
         fun getColors(context: Context): IntArray {
             val res = context.resources
-            return intArrayOf(
-                res.getColor(R.color.themed_icon_background_color),
-                res.getColor(R.color.themed_icon_color),
-                res.getColor(R.color.themed_icon_adaptive_background_color),
-            )
+            return if (isAxIconsEnabled(context)) {
+                intArrayOf(
+                    res.getColor(R.color.ax_themed_icon_background_color),
+                    res.getColor(R.color.ax_themed_icon_color),
+                    res.getColor(R.color.ax_themed_icon_adaptive_background_color),
+                )
+            } else {
+                intArrayOf(
+                    res.getColor(R.color.themed_icon_background_color),
+                    res.getColor(R.color.themed_icon_color),
+                    res.getColor(R.color.themed_icon_adaptive_background_color),
+                )
+            }
         }
     }
 }
